@@ -1,14 +1,14 @@
 package org.apache.lucene.contrib.bitset;
 
+import org.apache.lucene.search.DocIdSet;
+import org.apache.lucene.util.OpenBitSetDISI;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-
-import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.util.OpenBitSetDISI;
 
 public class BitsetOperationsExecutor {
 
@@ -26,8 +26,7 @@ public class BitsetOperationsExecutor {
     this.sliceSize = sliceSize;
   }
 
-  public OpenBitSetDISI bitsetOperations(DocIdSet[] bs, int finalBitsetSize, BitSetOperation operation)
-      throws Exception {
+  public OpenBitSetDISI bitsetOperations(DocIdSet[] bs, int finalBitsetSize, BitSetOperation operation) throws Exception {
     if (bs.length <= sliceSize) {
       new CallableOperation(bs, finalBitsetSize, operation).call();
     }
@@ -55,8 +54,7 @@ public class BitsetOperationsExecutor {
     Collection<CallableOperation> ops = new LinkedList<CallableOperation>();
     for (int i = 0; i < numOfOps; i++) {
       int startIndex = i * sliceSize;
-      ops.add(new CallableOperation(Arrays.copyOfRange(bs, startIndex, lastIndex(bs.length, startIndex)),
-          finalBitSetSize, operation));
+      ops.add(new CallableOperation(Arrays.copyOfRange(bs, startIndex, lastIndex(bs.length, startIndex)), finalBitSetSize, operation));
     }
 
     return ops;

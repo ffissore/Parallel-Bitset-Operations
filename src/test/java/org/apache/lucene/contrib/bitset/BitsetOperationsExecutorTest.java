@@ -1,25 +1,18 @@
 package org.apache.lucene.contrib.bitset;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.apache.lucene.contrib.bitset.BitSetOperation;
-import org.apache.lucene.contrib.bitset.BitsetOperationsExecutor;
-import org.apache.lucene.contrib.bitset.OR;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.OpenBitSetDISI;
 import org.apache.lucene.util.SortedVIntList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static org.junit.Assert.assertTrue;
 
 public class BitsetOperationsExecutorTest {
 

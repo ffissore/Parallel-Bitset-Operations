@@ -1,9 +1,9 @@
 package org.apache.lucene.contrib.bitset;
 
-import java.util.concurrent.Callable;
-
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.OpenBitSetDISI;
+
+import java.util.concurrent.Callable;
 
 public class CallableOperation implements Callable<OpenBitSetDISI> {
 
