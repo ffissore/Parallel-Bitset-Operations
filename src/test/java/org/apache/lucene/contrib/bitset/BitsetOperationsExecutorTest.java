@@ -8,7 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,17 +53,18 @@ public class BitsetOperationsExecutorTest {
       svil[i] = new SortedVIntList(ints);
     }
 
-    List<DocIdSet> l = new LinkedList<DocIdSet>();
-    for (int i = 0; i < 100; i++) {
-      // l.addAll(Arrays.asList(bs));
-      l.addAll(Arrays.asList(svil));
-    }
-    Collections.shuffle(l);
+    //List<DocIdSet> l = new LinkedList<DocIdSet>();
+    //for (int i = 0; i < 100; i++) {
+    // l.addAll(Arrays.asList(bs));
+    //l.addAll(Arrays.asList(svil));
+    //}
+    //Collections.shuffle(l);
 
-    docIdSets = l.toArray(new DocIdSet[l.size()]);
+    // docIdSets = l.toArray(new DocIdSet[l.size()]);
     // System.arraycopy(bs, 0, docIdSets, 0, bs.length);
     // System.arraycopy(svil, 0, docIdSets, bs.length, svil.length);
-    System.arraycopy(svil, 0, docIdSets, 0, svil.length);
+    docIdSets = svil;
+    //System.arraycopy(svil, 0, docIdSets, 0, svil.length);
 
     threadPool = Executors.newCachedThreadPool();
     bitsetOperationsExecutor = new BitsetOperationsExecutor(threadPool);

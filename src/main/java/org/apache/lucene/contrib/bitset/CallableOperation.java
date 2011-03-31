@@ -10,8 +10,12 @@ public class CallableOperation implements Callable<OpenBitSetDISI> {
   private final BitSetOperation operation;
   private final DocIdSet[] bs;
   private final int finalBitsetSize;
+  private final int startIndex;
+  private final int toIndex;
 
-  public CallableOperation(DocIdSet[] bs, int finalBitsetSize, BitSetOperation operation) {
+  public CallableOperation(DocIdSet[] bs, int startIndex, int toIndex, int finalBitsetSize, BitSetOperation operation) {
+    this.startIndex = startIndex;
+    this.toIndex = toIndex;
     this.finalBitsetSize = finalBitsetSize;
     this.operation = operation;
     this.bs = bs;
@@ -20,10 +24,8 @@ public class CallableOperation implements Callable<OpenBitSetDISI> {
   @Override
   public OpenBitSetDISI call() throws Exception {
     OpenBitSetDISI accumulator = new OpenBitSetDISI(finalBitsetSize);
-    int i = 0;
-    for (DocIdSet bitset : bs) {
-      operation.compute(accumulator, bitset);
-      i++;
+    for (int i = startIndex; i < toIndex; i++) {
+      operation.compute(accumulator, bs[i]);
     }
     return accumulator;
   }
