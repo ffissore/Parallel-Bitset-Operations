@@ -21,14 +21,8 @@ public class NOT implements BitSetOperation {
   }
 
   @Override
-  public OpenBitSetDISI newAccumulator(int bitsetSize) {
-    OpenBitSetDISI bs = new OpenBitSetDISI(bitsetSize);
-    long[] bits = bs.getBits();
-    for (int i = 0; i < bits.length; i++) {
-      bits[i] = Long.MAX_VALUE;
-    }
-    bs.setBits(bits);
-    return bs;
+  public OpenBitSetDISI newAccumulator(int bitsetSize, DocIdSet b) throws IOException {
+    return new OpenBitSetDISI(b.iterator(), bitsetSize);
   }
 
 }

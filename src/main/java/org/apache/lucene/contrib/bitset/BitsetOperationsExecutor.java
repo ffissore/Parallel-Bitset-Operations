@@ -12,26 +12,22 @@ import java.util.concurrent.Future;
 
 public class BitsetOperationsExecutor {
 
-  private static final int DEFAULT_SLICE_SIZE = 10000;
+  private static final int MIN_ARRAY_SIZE = 20000;
 
   private final ExecutorService threadPool;
-  private final int sliceSize;
 
   public BitsetOperationsExecutor(ExecutorService threadPool) {
-    this(threadPool, DEFAULT_SLICE_SIZE);
-  }
-
-  public BitsetOperationsExecutor(ExecutorService threadPool, int sliceSize) {
     this.threadPool = threadPool;
-    this.sliceSize = sliceSize;
   }
 
   public OpenBitSetDISI bitsetOperations(DocIdSet[] bs, int finalBitsetSize, BitSetOperation operation) throws Exception {
-    if (bs.length <= sliceSize) {
-      new CallableOperation(bs, 0, bs.length, finalBitsetSize, operation).call();
+    if (bs.length <= MIN_ARRAY_SIZE) {
+      return new CallableOperation(bs, 0, bs.length, finalBitsetSize, operation).call();
     }
 
-    Collection<CallableOperation> ops = sliceBitsets(bs, finalBitsetSize, operation);
+    int sliceSize = bs.length / Runtime.getRuntime().availableProcessors();
+
+    Collection<CallableOperation> ops = sliceBitsets(bs, finalBitsetSize, operation, sliceSize);
 
     List<Future<OpenBitSetDISI>> futureOps = threadPool.invokeAll(ops);
 
@@ -50,7 +46,7 @@ public class BitsetOperationsExecutor {
     return accumulated;
   }
 
-  protected Collection<CallableOperation> sliceBitsets(DocIdSet[] bs, int finalBitSetSize, BitSetOperation operation) {
+  protected Collection<CallableOperation> sliceBitsets(DocIdSet[] bs, int finalBitSetSize, BitSetOperation operation, int sliceSize) {
     int numOfOps = bs.length / sliceSize;
     if (bs.length % sliceSize != 0) {
       numOfOps++;
@@ -59,13 +55,13 @@ public class BitsetOperationsExecutor {
     Collection<CallableOperation> ops = new LinkedList<CallableOperation>();
     for (int i = 0; i < numOfOps; i++) {
       int startIndex = i * sliceSize;
-      ops.add(new CallableOperation(bs, startIndex, lastIndex(bs.length, startIndex), finalBitSetSize, operation));
+      ops.add(new CallableOperation(bs, startIndex, lastIndex(bs.length, startIndex, sliceSize), finalBitSetSize, operation));
     }
 
     return ops;
   }
 
-  private int lastIndex(int numberOfBitsets, int startIndex) {
+  private int lastIndex(int numberOfBitsets, int startIndex, int sliceSize) {
     int remaining = numberOfBitsets - startIndex;
     return remaining > sliceSize ? startIndex + sliceSize : startIndex + remaining;
   }

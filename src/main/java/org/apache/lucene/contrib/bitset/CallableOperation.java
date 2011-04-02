@@ -23,8 +23,8 @@ public class CallableOperation implements Callable<OpenBitSetDISI> {
 
   @Override
   public OpenBitSetDISI call() throws Exception {
-    OpenBitSetDISI accumulator = operation.newAccumulator(finalBitsetSize);
-    for (int i = startIndex; i < toIndex; i++) {
+    OpenBitSetDISI accumulator = operation.newAccumulator(finalBitsetSize, bs[startIndex]);
+    for (int i = startIndex + 1; i < toIndex; i++) {
       operation.compute(accumulator, bs[i]);
     }
     return accumulator;

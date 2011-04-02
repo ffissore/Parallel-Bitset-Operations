@@ -21,8 +21,8 @@ public class OR implements BitSetOperation {
   }
 
   @Override
-  public OpenBitSetDISI newAccumulator(int bitsetSize) {
-    return new OpenBitSetDISI(bitsetSize);
+  public OpenBitSetDISI newAccumulator(int bitsetSize, DocIdSet b) throws IOException {
+    return new OpenBitSetDISI(b.iterator(), bitsetSize);
   }
 
 }

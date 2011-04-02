@@ -80,12 +80,12 @@ public class BitsetOperationsExecutorTest {
   @Test
   public void shouldNOTTheDodIdSets() throws Exception {
     OpenBitSetDISI bs = bitsetOperationsExecutor.bitsetOperations(dis, 10, new NOT());
-    assertTrue(bs.get(0));
+    assertFalse(bs.get(0));
     assertFalse(bs.get(1));
     assertFalse(bs.get(2));
     assertFalse(bs.get(3));
-    assertTrue(bs.get(4));
-    assertFalse(bs.get(5));
+    assertFalse(bs.get(4));
+    assertTrue(bs.get(5));
     assertFalse(bs.get(6));
     assertFalse(bs.get(7));
     assertFalse(bs.get(8));
