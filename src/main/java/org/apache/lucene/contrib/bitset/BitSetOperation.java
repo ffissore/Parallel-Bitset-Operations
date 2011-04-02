@@ -9,4 +9,5 @@ public interface BitSetOperation {
 
   void compute(OpenBitSetDISI accumulator, DocIdSet bitset) throws IOException;
 
+  OpenBitSetDISI newAccumulator(int bitsetSize);
 }

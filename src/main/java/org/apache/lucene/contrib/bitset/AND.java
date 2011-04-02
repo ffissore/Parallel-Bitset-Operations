@@ -7,14 +7,14 @@ import org.apache.lucene.util.SortedVIntList;
 
 import java.io.IOException;
 
-public class OR implements BitSetOperation {
+public class AND implements BitSetOperation {
 
   @Override
   public void compute(OpenBitSetDISI accumulator, DocIdSet bitset) throws IOException {
     if (bitset instanceof OpenBitSet) {
-      accumulator.or((OpenBitSet) bitset);
+      accumulator.and((OpenBitSet) bitset);
     } else if (bitset instanceof SortedVIntList) {
-      accumulator.inPlaceOr(bitset.iterator());
+      accumulator.inPlaceAnd(bitset.iterator());
     } else {
       throw new IllegalArgumentException("Not supported:" + bitset);
     }
@@ -22,7 +22,13 @@ public class OR implements BitSetOperation {
 
   @Override
   public OpenBitSetDISI newAccumulator(int bitsetSize) {
-    return new OpenBitSetDISI(bitsetSize);
+    OpenBitSetDISI bs = new OpenBitSetDISI(bitsetSize);
+    long[] bits = bs.getBits();
+    for (int i = 0; i < bits.length; i++) {
+      bits[i] = Long.MAX_VALUE;
+    }
+    bs.setBits(bits);
+    return bs;
   }
 
 }
