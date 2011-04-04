@@ -128,9 +128,6 @@ public class OperationLoadTest {
 
     long slowRandomValue = result[randomIndex];
 
-    System.out.println(slowRandomValue);
-    System.out.println(slowDuration);
-
     System.out.println("========= FAST: START");
     startAt = System.currentTimeMillis();
     result = bitsetOperationsExecutor.bitsetOperations(docIdSets, toCompare, BS_SIZE, operation);
