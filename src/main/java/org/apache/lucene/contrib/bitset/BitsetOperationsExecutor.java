@@ -3,6 +3,7 @@ package org.apache.lucene.contrib.bitset;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.OpenBitSetDISI;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,5 +65,18 @@ public class BitsetOperationsExecutor {
   private int lastIndex(int numberOfBitsets, int startIndex, int sliceSize) {
     int remaining = numberOfBitsets - startIndex;
     return remaining > sliceSize ? startIndex + sliceSize : startIndex + remaining;
+  }
+
+  public long[] bitsetOperations(DocIdSet[] bs, DocIdSet toCompare, int finalBitsetSize, BitSetComparisonOperation operation) throws IOException {
+    long[] result = new long[bs.length];
+
+    OpenBitSetDISI accumulator = new OpenBitSetDISI(finalBitsetSize);
+    OpenBitSetDISI toCompareDisi = new OpenBitSetDISI(finalBitsetSize);
+    toCompareDisi.inPlaceOr(toCompare.iterator());
+    for (int i = 0; i < bs.length; i++) {
+      result[i] = operation.compute(accumulator, bs[i], toCompareDisi);
+    }
+
+    return result;
   }
 }
