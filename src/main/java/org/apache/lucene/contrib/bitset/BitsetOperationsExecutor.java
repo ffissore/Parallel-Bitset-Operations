@@ -16,13 +16,19 @@ public class BitsetOperationsExecutor {
   private static final int MIN_ARRAY_SIZE = 20000;
 
   private final ExecutorService threadPool;
+  private final int minArraySize;
 
   public BitsetOperationsExecutor(ExecutorService threadPool) {
+    this(threadPool, MIN_ARRAY_SIZE);
+  }
+
+  public BitsetOperationsExecutor(ExecutorService threadPool, int minArraySize) {
     this.threadPool = threadPool;
+    this.minArraySize = minArraySize;
   }
 
   public OpenBitSetDISI bitsetOperations(DocIdSet[] bs, int finalBitsetSize, BitSetOperation operation) throws Exception {
-    if (bs.length <= MIN_ARRAY_SIZE) {
+    if (bs.length <= minArraySize) {
       return new CallableOperation(bs, 0, bs.length, finalBitsetSize, operation).call();
     }
 
@@ -71,7 +77,7 @@ public class BitsetOperationsExecutor {
     OpenBitSetDISI toCompareDisi = new OpenBitSetDISI(finalBitsetSize);
     toCompareDisi.inPlaceOr(toCompare.iterator());
 
-    if (bs.length <= MIN_ARRAY_SIZE) {
+    if (bs.length <= minArraySize) {
       return new CallableComparison(bs, 0, bs.length, finalBitsetSize, toCompareDisi, operation).call();
     }
 

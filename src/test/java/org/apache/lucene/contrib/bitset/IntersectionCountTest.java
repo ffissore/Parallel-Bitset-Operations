@@ -19,13 +19,14 @@ public class IntersectionCountTest {
 
   @Before
   public void setup() {
-    bs = new DocIdSet[3];
-    bs[0] = new SortedVIntList(new int[]{1, 2, 3});
-    bs[1] = new SortedVIntList(new int[]{2, 3, 4});
-    bs[2] = new SortedVIntList(new int[]{4, 5, 6});
+    bs = new DocIdSet[4];
+    bs[0] = new SortedVIntList(1, 2, 3);
+    bs[1] = new SortedVIntList(2, 3, 4);
+    bs[2] = new SortedVIntList(4, 5, 6);
+    bs[3] = new SortedVIntList(7, 8, 9);
 
     threadPool = Executors.newCachedThreadPool();
-    bitsetOperationsExecutor = new BitsetOperationsExecutor(threadPool);
+    bitsetOperationsExecutor = new BitsetOperationsExecutor(threadPool, 1);
   }
 
   @After
@@ -36,10 +37,11 @@ public class IntersectionCountTest {
 
   @Test
   public void shouldIntersect() throws Exception {
-    int finalBitSetSize = 4;
-    long[] result = bitsetOperationsExecutor.bitsetOperations(bs, new SortedVIntList(new int[]{2, 3}), finalBitSetSize, new IntersectionCount());
+    long[] result = bitsetOperationsExecutor.bitsetOperations(bs, new SortedVIntList(2, 3), 10, new IntersectionCount());
+    assertEquals(bs.length, result.length);
     assertEquals(2, result[0]);
     assertEquals(2, result[1]);
     assertEquals(0, result[2]);
+    assertEquals(0, result[3]);
   }
 }

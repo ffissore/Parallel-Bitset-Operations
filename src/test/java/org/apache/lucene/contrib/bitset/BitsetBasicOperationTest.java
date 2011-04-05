@@ -25,7 +25,6 @@ public class BitsetBasicOperationTest {
     dis = new DocIdSet[4];
 
     OpenBitSet bs = new OpenBitSet(10);
-    bs = new OpenBitSet(10);
     bs.fastSet(1);
     bs.fastSet(5);
     dis[0] = bs;
@@ -35,11 +34,11 @@ public class BitsetBasicOperationTest {
     bs.fastSet(2);
     dis[1] = bs;
 
-    dis[2] = new SortedVIntList(new int[]{1, 4});
-    dis[3] = new SortedVIntList(new int[]{1, 2, 6});
+    dis[2] = new SortedVIntList(1, 4);
+    dis[3] = new SortedVIntList(1, 2, 6);
 
     threadPool = Executors.newCachedThreadPool();
-    bitsetOperationsExecutor = new BitsetOperationsExecutor(threadPool);
+    bitsetOperationsExecutor = new BitsetOperationsExecutor(threadPool, 1);
   }
 
   @After
