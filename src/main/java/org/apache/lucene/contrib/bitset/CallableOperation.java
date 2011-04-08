@@ -19,6 +19,10 @@ public class CallableOperation implements Callable<OpenBitSetDISI> {
     this.finalBitsetSize = finalBitsetSize;
     this.operation = operation;
     this.bs = bs;
+
+    if (bs.length == 0) {
+      throw new IllegalArgumentException("DocIdSet array cannot be empty");
+    }
   }
 
   @Override

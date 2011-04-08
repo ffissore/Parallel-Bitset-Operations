@@ -22,23 +22,25 @@ public class CallableComparison<T> implements Callable<T[]> {
     this.finalBitsetSize = finalBitsetSize;
     this.toCompare = toCompare;
     this.operation = operation;
+
+    if (bs.length == 0) {
+      throw new IllegalArgumentException("DocIdSet array cannot be empty");
+    }
   }
 
   @SuppressWarnings({"unchecked"})
   @Override
   public T[] call() throws Exception {
-
     OpenBitSetDISI accumulator = new OpenBitSetDISI(finalBitsetSize);
 
     OpenBitSetDISI toCompareDisi = new OpenBitSetDISI(finalBitsetSize);
     toCompareDisi.inPlaceOr(toCompare.iterator());
 
-    T[] result = (T[]) new Object[toIndex - startIndex];
+    Object[] result = new Object[toIndex - startIndex];
     for (int i = startIndex; i < toIndex; i++) {
       result[i - startIndex] = operation.compute(accumulator, bs[i], toCompareDisi);
     }
 
-    return result;
-
+    return ArrayUtils.typedArray(result, (Class<T>) result[0].getClass());
   }
 }

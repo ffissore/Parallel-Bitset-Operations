@@ -14,11 +14,11 @@ import java.util.concurrent.Executors;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class BitsetBasicOperationTest {
+public abstract class AbstractBitsetBasicOperationsTest {
 
   private DocIdSet[] dis;
-  private ExecutorService threadPool;
-  private BitsetOperationsExecutor bitsetOperationsExecutor;
+  protected ExecutorService threadPool;
+  protected BitsetOperationsExecutor bitsetOperationsExecutor;
 
   @Before
   public void setup() {
@@ -38,7 +38,6 @@ public class BitsetBasicOperationTest {
     dis[3] = new SortedVIntList(1, 2, 6);
 
     threadPool = Executors.newCachedThreadPool();
-    bitsetOperationsExecutor = new BitsetOperationsExecutor(threadPool, 1);
   }
 
   @After
@@ -47,7 +46,7 @@ public class BitsetBasicOperationTest {
   }
 
   @Test
-  public void shouldORTheDodIdSets() throws Exception {
+  public void shouldOrTheDocIdSets() throws Exception {
     OpenBitSetDISI bs = bitsetOperationsExecutor.bitsetOperations(dis, 10, new OR());
     assertTrue(bs.get(0));
     assertTrue(bs.get(1));
@@ -62,7 +61,7 @@ public class BitsetBasicOperationTest {
   }
 
   @Test
-  public void shouldANDTheDodIdSets() throws Exception {
+  public void shouldAndTheDocIdSets() throws Exception {
     OpenBitSetDISI bs = bitsetOperationsExecutor.bitsetOperations(dis, 10, new AND());
     assertFalse(bs.get(0));
     assertTrue(bs.get(1));
@@ -77,7 +76,7 @@ public class BitsetBasicOperationTest {
   }
 
   @Test
-  public void shouldNOTTheDodIdSets() throws Exception {
+  public void shouldNotTheDocIdSets() throws Exception {
     OpenBitSetDISI bs = bitsetOperationsExecutor.bitsetOperations(dis, 10, new NOT());
     assertFalse(bs.get(0));
     assertFalse(bs.get(1));
@@ -105,4 +104,6 @@ public class BitsetBasicOperationTest {
     assertFalse(bs.get(8));
     assertFalse(bs.get(9));
   }
+
+
 }

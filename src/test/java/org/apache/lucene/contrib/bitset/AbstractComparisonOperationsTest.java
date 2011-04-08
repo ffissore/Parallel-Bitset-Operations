@@ -11,11 +11,11 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 
-public class IntersectionCountTest {
+public class AbstractComparisonOperationsTest {
 
   private DocIdSet[] bs;
-  private ExecutorService threadPool;
-  private BitsetOperationsExecutor bitsetOperationsExecutor;
+  protected ExecutorService threadPool;
+  protected BitsetOperationsExecutor bitsetOperationsExecutor;
 
   @Before
   public void setup() {
@@ -26,7 +26,6 @@ public class IntersectionCountTest {
     bs[3] = new SortedVIntList(7, 8, 9);
 
     threadPool = Executors.newCachedThreadPool();
-    bitsetOperationsExecutor = new BitsetOperationsExecutor(threadPool, 1);
   }
 
   @After
@@ -43,4 +42,5 @@ public class IntersectionCountTest {
     assertEquals(0, result[2].longValue());
     assertEquals(0, result[3].longValue());
   }
+
 }

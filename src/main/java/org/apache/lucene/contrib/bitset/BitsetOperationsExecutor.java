@@ -4,7 +4,6 @@ import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.util.OpenBitSetDISI;
 
-import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,31 +43,6 @@ public class BitsetOperationsExecutor {
     return new CallableOperation(accumulated, 0, accumulated.length, finalBitsetSize, operation).call();
   }
 
-  private OpenBitSetDISI[] accumulate(List<Future<OpenBitSetDISI>> futureOps) throws ExecutionException, InterruptedException {
-    OpenBitSetDISI[] accumulated = new OpenBitSetDISI[futureOps.size()];
-    int i = 0;
-    for (Future<OpenBitSetDISI> op : futureOps) {
-      accumulated[i] = op.get();
-      i++;
-    }
-    return accumulated;
-  }
-
-  protected Collection<CallableOperation> sliceBitsets(DocIdSet[] bs, int finalBitSetSize, BitSetOperation operation, int sliceSize) {
-    int numOfOps = bs.length / sliceSize;
-    if (bs.length % sliceSize != 0) {
-      numOfOps++;
-    }
-
-    Collection<CallableOperation> ops = new LinkedList<CallableOperation>();
-    for (int i = 0; i < numOfOps; i++) {
-      int startIndex = i * sliceSize;
-      ops.add(new CallableOperation(bs, startIndex, lastIndex(bs.length, startIndex, sliceSize), finalBitSetSize, operation));
-    }
-
-    return ops;
-  }
-
   private int lastIndex(int numberOfBitsets, int startIndex, int sliceSize) {
     int remaining = numberOfBitsets - startIndex;
     return remaining > sliceSize ? startIndex + sliceSize : startIndex + remaining;
@@ -91,6 +65,21 @@ public class BitsetOperationsExecutor {
     return accumulate(futureOps);
   }
 
+  protected Collection<CallableOperation> sliceBitsets(DocIdSet[] bs, int finalBitSetSize, BitSetOperation operation, int sliceSize) {
+    int numOfOps = bs.length / sliceSize;
+    if (bs.length % sliceSize != 0) {
+      numOfOps++;
+    }
+
+    Collection<CallableOperation> ops = new LinkedList<CallableOperation>();
+    for (int i = 0; i < numOfOps; i++) {
+      int startIndex = i * sliceSize;
+      ops.add(new CallableOperation(bs, startIndex, lastIndex(bs.length, startIndex, sliceSize), finalBitSetSize, operation));
+    }
+
+    return ops;
+  }
+
   protected <T> Collection<CallableComparison<T>> sliceBitsets(DocIdSet[] bs, int finalBitSetSize, OpenBitSet toCompare, BitSetComparisonOperation<T> operation, int sliceSize) {
     int numOfOps = bs.length / sliceSize;
     if (bs.length % sliceSize != 0) {
@@ -106,23 +95,34 @@ public class BitsetOperationsExecutor {
     return ops;
   }
 
+  private OpenBitSetDISI[] accumulate(List<Future<OpenBitSetDISI>> futureOps) throws ExecutionException, InterruptedException {
+    OpenBitSetDISI[] accumulated = new OpenBitSetDISI[futureOps.size()];
+    int i = 0;
+    for (Future<OpenBitSetDISI> op : futureOps) {
+      accumulated[i] = op.get();
+      i++;
+    }
+    return accumulated;
+  }
+
   @SuppressWarnings({"unchecked"})
   private <T> T[] accumulate(List<Future<T[]>> futureOps) throws ExecutionException, InterruptedException {
-    T[][] partialResults = (T[][]) new Object[futureOps.size()][];
+    Object[][] partitionResults = new Object[futureOps.size()][];
     int i = 0;
     int sum = 0;
     for (Future<T[]> op : futureOps) {
-      partialResults[i] = op.get();
-      sum += partialResults[i].length;
+      partitionResults[i] = op.get();
+      sum += partitionResults[i].length;
       i++;
     }
-    assert partialResults.length > 0 && partialResults[0].length > 0;
-    T[] result = (T[]) Array.newInstance(partialResults[0][0].getClass(), sum);
+
+    Object[] result = new Object[sum];
     int lastIndex = 0;
-    for (T[] partial : partialResults) {
+    for (Object[] partial : partitionResults) {
       System.arraycopy(partial, 0, result, lastIndex, partial.length);
       lastIndex += partial.length;
     }
-    return result;
+
+    return ArrayUtils.typedArray(result, (Class<T>) result[0].getClass());
   }
 }
