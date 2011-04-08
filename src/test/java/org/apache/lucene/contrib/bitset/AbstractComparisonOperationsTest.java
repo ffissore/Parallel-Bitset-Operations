@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 
-public class AbstractComparisonOperationsTest {
+public abstract class AbstractComparisonOperationsTest {
 
   private DocIdSet[] bs;
   protected ExecutorService threadPool;
