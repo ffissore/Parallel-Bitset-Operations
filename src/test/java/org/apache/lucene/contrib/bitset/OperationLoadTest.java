@@ -100,14 +100,14 @@ public class OperationLoadTest {
     int proc = Runtime.getRuntime().availableProcessors();
 
     long expectedMaxFastDuration = slowDuration / proc;
-    expectedMaxFastDuration += (expectedMaxFastDuration / 100 * 20);
-    assertTrue("Was expecting a fast duration less than " + expectedMaxFastDuration, expectedMaxFastDuration > fastDuration);
+    expectedMaxFastDuration += (expectedMaxFastDuration / 100 * 25);
+    assertTrue("Was expecting a fast duration less than " + expectedMaxFastDuration + " but was " + fastDuration, expectedMaxFastDuration > fastDuration);
   }
 
   @Test
   public void parallel_IntersectionCount_ShouldBeFaster() throws Exception {
     IntersectionCount operation = new IntersectionCount();
-    long[] result = new long[docIdSets.length];
+    Long[] result = new Long[docIdSets.length];
 
     System.out.println("========= SLOW: START");
     long startAt = System.currentTimeMillis();
@@ -146,7 +146,7 @@ public class OperationLoadTest {
     int proc = Runtime.getRuntime().availableProcessors();
 
     long expectedMaxFastDuration = slowDuration / proc;
-    expectedMaxFastDuration += (expectedMaxFastDuration / 100 * 20);
+    expectedMaxFastDuration += (expectedMaxFastDuration / 100 * 25);
     assertTrue("Was expecting a fast duration less than " + expectedMaxFastDuration, expectedMaxFastDuration > fastDuration);
   }
 

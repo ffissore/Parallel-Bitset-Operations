@@ -4,6 +4,7 @@ import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.util.OpenBitSetDISI;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,50 +74,52 @@ public class BitsetOperationsExecutor {
     return remaining > sliceSize ? startIndex + sliceSize : startIndex + remaining;
   }
 
-  public long[] bitsetOperations(DocIdSet[] bs, DocIdSet toCompare, int finalBitsetSize, BitSetComparisonOperation operation) throws Exception {
+  public <T> T[] bitsetOperations(DocIdSet[] bs, DocIdSet toCompare, int finalBitsetSize, BitSetComparisonOperation<T> operation) throws Exception {
     OpenBitSetDISI toCompareDisi = new OpenBitSetDISI(finalBitsetSize);
     toCompareDisi.inPlaceOr(toCompare.iterator());
 
     if (bs.length <= minArraySize) {
-      return new CallableComparison(bs, 0, bs.length, finalBitsetSize, toCompareDisi, operation).call();
+      return new CallableComparison<T>(bs, 0, bs.length, finalBitsetSize, toCompareDisi, operation).call();
     }
 
     int sliceSize = bs.length / Runtime.getRuntime().availableProcessors();
 
-    Collection<CallableComparison> ops = sliceBitsets(bs, finalBitsetSize, toCompareDisi, operation, sliceSize);
+    Collection<CallableComparison<T>> ops = sliceBitsets(bs, finalBitsetSize, toCompareDisi, operation, sliceSize);
 
-    List<Future<long[]>> futureOps = threadPool.invokeAll(ops);
+    List<Future<T[]>> futureOps = threadPool.invokeAll(ops);
 
     return accumulate(futureOps);
   }
 
-  protected Collection<CallableComparison> sliceBitsets(DocIdSet[] bs, int finalBitSetSize, OpenBitSet toCompare, BitSetComparisonOperation operation, int sliceSize) {
+  protected <T> Collection<CallableComparison<T>> sliceBitsets(DocIdSet[] bs, int finalBitSetSize, OpenBitSet toCompare, BitSetComparisonOperation<T> operation, int sliceSize) {
     int numOfOps = bs.length / sliceSize;
     if (bs.length % sliceSize != 0) {
       numOfOps++;
     }
 
-    Collection<CallableComparison> ops = new LinkedList<CallableComparison>();
+    Collection<CallableComparison<T>> ops = new LinkedList<CallableComparison<T>>();
     for (int i = 0; i < numOfOps; i++) {
       int startIndex = i * sliceSize;
-      ops.add(new CallableComparison(bs, startIndex, lastIndex(bs.length, startIndex, sliceSize), finalBitSetSize, toCompare, operation));
+      ops.add(new CallableComparison<T>(bs, startIndex, lastIndex(bs.length, startIndex, sliceSize), finalBitSetSize, toCompare, operation));
     }
 
     return ops;
   }
 
-  private long[] accumulate(List<Future<long[]>> futureOps) throws ExecutionException, InterruptedException {
-    long[][] partialResults = new long[futureOps.size()][];
+  @SuppressWarnings({"unchecked"})
+  private <T> T[] accumulate(List<Future<T[]>> futureOps) throws ExecutionException, InterruptedException {
+    T[][] partialResults = (T[][]) new Object[futureOps.size()][];
     int i = 0;
     int sum = 0;
-    for (Future<long[]> op : futureOps) {
+    for (Future<T[]> op : futureOps) {
       partialResults[i] = op.get();
       sum += partialResults[i].length;
       i++;
     }
-    long[] result = new long[sum];
+    assert partialResults.length > 0 && partialResults[0].length > 0;
+    T[] result = (T[]) Array.newInstance(partialResults[0][0].getClass(), sum);
     int lastIndex = 0;
-    for (long[] partial : partialResults) {
+    for (T[] partial : partialResults) {
       System.arraycopy(partial, 0, result, lastIndex, partial.length);
       lastIndex += partial.length;
     }

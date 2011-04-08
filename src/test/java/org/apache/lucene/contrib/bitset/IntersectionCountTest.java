@@ -34,14 +34,13 @@ public class IntersectionCountTest {
     threadPool.shutdownNow();
   }
 
-
   @Test
   public void shouldIntersect() throws Exception {
-    long[] result = bitsetOperationsExecutor.bitsetOperations(bs, new SortedVIntList(2, 3), 10, new IntersectionCount());
+    Long[] result = bitsetOperationsExecutor.bitsetOperations(bs, new SortedVIntList(2, 3), 10, new IntersectionCount());
     assertEquals(bs.length, result.length);
-    assertEquals(2, result[0]);
-    assertEquals(2, result[1]);
-    assertEquals(0, result[2]);
-    assertEquals(0, result[3]);
+    assertEquals(2, result[0].longValue());
+    assertEquals(2, result[1].longValue());
+    assertEquals(0, result[2].longValue());
+    assertEquals(0, result[3].longValue());
   }
 }

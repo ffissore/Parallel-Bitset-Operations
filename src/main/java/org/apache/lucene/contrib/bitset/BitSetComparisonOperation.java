@@ -6,8 +6,8 @@ import org.apache.lucene.util.OpenBitSetDISI;
 
 import java.io.IOException;
 
-public interface BitSetComparisonOperation {
+public interface BitSetComparisonOperation<T> {
 
-  long compute(OpenBitSetDISI accumulator, DocIdSet target, OpenBitSet toCompare) throws IOException;
+  T compute(OpenBitSetDISI accumulator, DocIdSet target, OpenBitSet toCompare) throws IOException;
 
 }

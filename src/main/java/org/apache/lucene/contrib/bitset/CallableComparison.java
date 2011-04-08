@@ -6,16 +6,16 @@ import org.apache.lucene.util.OpenBitSetDISI;
 
 import java.util.concurrent.Callable;
 
-public class CallableComparison implements Callable<long[]> {
+public class CallableComparison<T> implements Callable<T[]> {
 
   private final DocIdSet[] bs;
   private final int startIndex;
   private final int toIndex;
   private final int finalBitsetSize;
   private final OpenBitSet toCompare;
-  private final BitSetComparisonOperation operation;
+  private final BitSetComparisonOperation<T> operation;
 
-  public CallableComparison(DocIdSet[] bs, int startIndex, int toIndex, int finalBitsetSize, OpenBitSet toCompare, BitSetComparisonOperation operation) {
+  public CallableComparison(DocIdSet[] bs, int startIndex, int toIndex, int finalBitsetSize, OpenBitSet toCompare, BitSetComparisonOperation<T> operation) {
     this.bs = bs;
     this.startIndex = startIndex;
     this.toIndex = toIndex;
@@ -24,15 +24,16 @@ public class CallableComparison implements Callable<long[]> {
     this.operation = operation;
   }
 
+  @SuppressWarnings({"unchecked"})
   @Override
-  public long[] call() throws Exception {
+  public T[] call() throws Exception {
 
     OpenBitSetDISI accumulator = new OpenBitSetDISI(finalBitsetSize);
 
     OpenBitSetDISI toCompareDisi = new OpenBitSetDISI(finalBitsetSize);
     toCompareDisi.inPlaceOr(toCompare.iterator());
 
-    long[] result = new long[toIndex - startIndex];
+    T[] result = (T[]) new Object[toIndex - startIndex];
     for (int i = startIndex; i < toIndex; i++) {
       result[i - startIndex] = operation.compute(accumulator, bs[i], toCompareDisi);
     }

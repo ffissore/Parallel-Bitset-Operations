@@ -6,10 +6,10 @@ import org.apache.lucene.util.OpenBitSetDISI;
 
 import java.io.IOException;
 
-public class IntersectionCount implements BitSetComparisonOperation {
+public class IntersectionCount implements BitSetComparisonOperation<Long> {
 
   @Override
-  public long compute(OpenBitSetDISI accumulator, DocIdSet target, OpenBitSet toCompare) throws IOException {
+  public Long compute(OpenBitSetDISI accumulator, DocIdSet target, OpenBitSet toCompare) throws IOException {
     accumulator.clear(0, accumulator.capacity());
     accumulator.inPlaceOr(target.iterator());
     return OpenBitSet.intersectionCount(accumulator, toCompare);
