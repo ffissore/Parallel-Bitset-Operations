@@ -1,12 +1,32 @@
+/*
+ * Parallel Bitset Operations
+ * Copyright (C) 2011 Federico Fissore
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General
+ * Public License along with this library; if not, see
+ * http://www.gnu.org/licenses/lgpl-3.0.txt
+ */
+
 package org.apache.lucene.contrib.bitset;
 
+import org.apache.lucene.contrib.bitset.ops.CommutativeOp;
+import org.apache.lucene.contrib.bitset.ops.ComparisonOp;
 import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.util.OpenBitSetDISI;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -27,72 +47,47 @@ public class BitsetOperationsExecutor {
     this.minArraySize = minArraySize;
   }
 
-  public OpenBitSetDISI bitsetOperations(DocIdSet[] bs, int finalBitsetSize, BitSetOperation operation) throws Exception {
+  public OpenBitSetDISI bitsetOperations(DocIdSet[] bs, final int finalBitsetSize, final CommutativeOp operation) throws Exception {
     if (bs.length <= minArraySize) {
-      return new CallableOperation(bs, 0, bs.length, finalBitsetSize, operation).call();
+      return new CommutativeOpCallable(bs, 0, bs.length, finalBitsetSize, operation).call();
     }
 
-    int sliceSize = bs.length / Runtime.getRuntime().availableProcessors();
+    Collection<Callable<OpenBitSetDISI>> ops = new BitSetSlicer<OpenBitSetDISI>() {
 
-    Collection<CallableOperation> ops = sliceBitsets(bs, finalBitsetSize, operation, sliceSize);
+      @Override
+      protected Callable<OpenBitSetDISI> newOpCallable(DocIdSet[] bs, int fromIndex, int toIndex) {
+        return new CommutativeOpCallable(bs, fromIndex, toIndex, finalBitsetSize, operation);
+      }
 
-    List<Future<OpenBitSetDISI>> futureOps = threadPool.invokeAll(ops);
+    }.sliceBitsets(bs);
 
-    OpenBitSetDISI[] accumulated = accumulate(futureOps);
+    List<Future<OpenBitSetDISI>> futures = threadPool.invokeAll(ops);
 
-    return new CallableOperation(accumulated, 0, accumulated.length, finalBitsetSize, operation).call();
+    OpenBitSetDISI[] accumulated = accumulate(futures);
+
+    return new CommutativeOpCallable(accumulated, 0, accumulated.length, finalBitsetSize, operation).call();
   }
 
-  private int lastIndex(int numberOfBitsets, int startIndex, int sliceSize) {
-    int remaining = numberOfBitsets - startIndex;
-    return remaining > sliceSize ? startIndex + sliceSize : startIndex + remaining;
-  }
-
-  public <T> T[] bitsetOperations(DocIdSet[] bs, DocIdSet toCompare, int finalBitsetSize, BitSetComparisonOperation<T> operation) throws Exception {
-    OpenBitSetDISI toCompareDisi = new OpenBitSetDISI(finalBitsetSize);
+  public <T> T[] bitsetOperations(DocIdSet[] bs, DocIdSet toCompare, final int finalBitsetSize, final ComparisonOp<T> operation) throws Exception {
+    final OpenBitSetDISI toCompareDisi = new OpenBitSetDISI(finalBitsetSize);
     toCompareDisi.inPlaceOr(toCompare.iterator());
 
     if (bs.length <= minArraySize) {
-      return new CallableComparison<T>(bs, 0, bs.length, finalBitsetSize, toCompareDisi, operation).call();
+      return new ComparisonOpCallable<T>(bs, 0, bs.length, finalBitsetSize, toCompareDisi, operation).call();
     }
 
-    int sliceSize = bs.length / Runtime.getRuntime().availableProcessors();
+    Collection<Callable<T[]>> ops = new BitSetSlicer<T[]>() {
 
-    Collection<CallableComparison<T>> ops = sliceBitsets(bs, finalBitsetSize, toCompareDisi, operation, sliceSize);
+      @Override
+      protected Callable<T[]> newOpCallable(DocIdSet[] bs, int fromIndex, int toIndex) {
+        return new ComparisonOpCallable<T>(bs, fromIndex, toIndex, finalBitsetSize, toCompareDisi, operation);
+      }
 
-    List<Future<T[]>> futureOps = threadPool.invokeAll(ops);
+    }.sliceBitsets(bs);
 
-    return accumulate(futureOps);
-  }
+    List<Future<T[]>> futures = threadPool.invokeAll(ops);
 
-  protected Collection<CallableOperation> sliceBitsets(DocIdSet[] bs, int finalBitSetSize, BitSetOperation operation, int sliceSize) {
-    int numOfOps = bs.length / sliceSize;
-    if (bs.length % sliceSize != 0) {
-      numOfOps++;
-    }
-
-    Collection<CallableOperation> ops = new LinkedList<CallableOperation>();
-    for (int i = 0; i < numOfOps; i++) {
-      int startIndex = i * sliceSize;
-      ops.add(new CallableOperation(bs, startIndex, lastIndex(bs.length, startIndex, sliceSize), finalBitSetSize, operation));
-    }
-
-    return ops;
-  }
-
-  protected <T> Collection<CallableComparison<T>> sliceBitsets(DocIdSet[] bs, int finalBitSetSize, OpenBitSet toCompare, BitSetComparisonOperation<T> operation, int sliceSize) {
-    int numOfOps = bs.length / sliceSize;
-    if (bs.length % sliceSize != 0) {
-      numOfOps++;
-    }
-
-    Collection<CallableComparison<T>> ops = new LinkedList<CallableComparison<T>>();
-    for (int i = 0; i < numOfOps; i++) {
-      int startIndex = i * sliceSize;
-      ops.add(new CallableComparison<T>(bs, startIndex, lastIndex(bs.length, startIndex, sliceSize), finalBitSetSize, toCompare, operation));
-    }
-
-    return ops;
+    return accumulate(futures);
   }
 
   private OpenBitSetDISI[] accumulate(List<Future<OpenBitSetDISI>> futureOps) throws ExecutionException, InterruptedException {

@@ -17,17 +17,20 @@
  * http://www.gnu.org/licenses/lgpl-3.0.txt
  */
 
-package org.apache.lucene.contrib.bitset;
+package org.apache.lucene.contrib.bitset.ops;
 
-import java.lang.reflect.Array;
+import org.apache.lucene.search.DocIdSet;
+import org.apache.lucene.util.OpenBitSet;
+import org.apache.lucene.util.OpenBitSetDISI;
 
-class ArrayUtils {
+import java.io.IOException;
 
-  @SuppressWarnings({"unchecked"})
-  public static <T> T[] typedArray(Object[] src, Class<T> clazz) {
-    T[] dest = (T[]) Array.newInstance(clazz, src.length);
-    System.arraycopy(src, 0, dest, 0, src.length);
-    return dest;
+public class IntersectionCount implements ComparisonOp<Long> {
+
+  @Override
+  public Long compute(OpenBitSetDISI accumulator, DocIdSet target, OpenBitSet toCompare) throws IOException {
+    accumulator.clear(0, accumulator.capacity());
+    accumulator.inPlaceOr(target.iterator());
+    return OpenBitSet.intersectionCount(accumulator, toCompare);
   }
-
 }

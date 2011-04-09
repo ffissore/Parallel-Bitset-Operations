@@ -1,11 +1,33 @@
+/*
+ * Parallel Bitset Operations
+ * Copyright (C) 2011 Federico Fissore
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General
+ * Public License along with this library; if not, see
+ * http://www.gnu.org/licenses/lgpl-3.0.txt
+ */
+
 package org.apache.lucene.contrib.bitset;
 
+import org.apache.lucene.contrib.bitset.ops.IntersectionCount;
+import org.apache.lucene.contrib.bitset.ops.OR;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.util.OpenBitSetDISI;
 import org.apache.lucene.util.SortedVIntList;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -69,12 +91,13 @@ public class OperationLoadTest {
   }
 
   @Test
+  @Ignore
   public void parrallel_OR_ShouldBeFaster() throws Exception {
     OR operation = new OR();
 
     System.out.println("========= SLOW: START");
     long startAt = System.currentTimeMillis();
-    OpenBitSetDISI finalBs = new CallableOperation(docIdSets, 0, docIdSets.length, BS_SIZE, operation).call();
+    OpenBitSetDISI finalBs = new CommutativeOpCallable(docIdSets, 0, docIdSets.length, BS_SIZE, operation).call();
     long slowDuration = System.currentTimeMillis() - startAt;
     System.out.println("========= SLOW: end");
 
@@ -105,6 +128,7 @@ public class OperationLoadTest {
   }
 
   @Test
+  @Ignore
   public void parallel_IntersectionCount_ShouldBeFaster() throws Exception {
     IntersectionCount operation = new IntersectionCount();
     Long[] result = new Long[docIdSets.length];
