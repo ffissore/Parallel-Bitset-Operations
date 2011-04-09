@@ -32,6 +32,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <scm>
+        <connection>scm:git:git@github.com:ffissore/Parallel-Bitset-Operations.git</connection>
+        <developerConnection>scm:git:ssh://ffissore@gitent-scm.com/git/opensource/parallel-bitset-operations.git</developerConnection>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
