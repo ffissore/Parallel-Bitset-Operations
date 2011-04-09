@@ -1,4 +1,4 @@
-parallel-bitset-operations.iml
-parallel-bitset-operations.ipr
-parallel-bitset-operations.iws
+*.iml
+*.ipr
+*.iws
 target
