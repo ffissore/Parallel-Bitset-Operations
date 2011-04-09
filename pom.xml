@@ -17,7 +17,8 @@
   ~ http://www.gnu.org/licenses/lgpl-3.0.txt
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.apache.lucene.contrib.bitset</groupId>
@@ -33,7 +34,8 @@
 
     <scm>
         <connection>scm:git:git@github.com:ffissore/Parallel-Bitset-Operations.git</connection>
-        <developerConnection>scm:git:ssh://ffissore@gitent-scm.com/git/opensource/parallel-bitset-operations.git</developerConnection>
+        <developerConnection>scm:git:ssh://ffissore@gitent-scm.com/git/opensource/parallel-bitset-operations.git
+        </developerConnection>
     </scm>
 
     <build>
@@ -44,6 +46,14 @@
                     <source>1.6</source>
                     <target>1.6</target>
                     <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/bin.xml</descriptor>
+                    </descriptors>
                 </configuration>
             </plugin>
         </plugins>
