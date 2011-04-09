@@ -22,7 +22,7 @@
 
     <groupId>org.apache.lucene.contrib.bitset</groupId>
     <artifactId>parallel-bitset-operations</artifactId>
-    <version>0.2</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Parallel Bitset Operation</name>
