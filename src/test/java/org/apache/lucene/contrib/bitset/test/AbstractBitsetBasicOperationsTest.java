@@ -17,8 +17,9 @@
  * http://www.gnu.org/licenses/lgpl-3.0.txt
  */
 
-package org.apache.lucene.contrib.bitset;
+package org.apache.lucene.contrib.bitset.test;
 
+import org.apache.lucene.contrib.bitset.BitsetOperationsExecutor;
 import org.apache.lucene.contrib.bitset.ops.AND;
 import org.apache.lucene.contrib.bitset.ops.NOT;
 import org.apache.lucene.contrib.bitset.ops.OR;
@@ -70,7 +71,7 @@ public abstract class AbstractBitsetBasicOperationsTest {
 
   @Test
   public void shouldOrTheDocIdSets() throws Exception {
-    OpenBitSetDISI bs = bitsetOperationsExecutor.bitsetOperations(dis, 10, new OR());
+    OpenBitSetDISI bs = bitsetOperationsExecutor.perform(dis, 10, new OR());
     assertTrue(bs.get(0));
     assertTrue(bs.get(1));
     assertTrue(bs.get(2));
@@ -85,7 +86,7 @@ public abstract class AbstractBitsetBasicOperationsTest {
 
   @Test
   public void shouldAndTheDocIdSets() throws Exception {
-    OpenBitSetDISI bs = bitsetOperationsExecutor.bitsetOperations(dis, 10, new AND());
+    OpenBitSetDISI bs = bitsetOperationsExecutor.perform(dis, 10, new AND());
     assertFalse(bs.get(0));
     assertTrue(bs.get(1));
     assertFalse(bs.get(2));
@@ -100,7 +101,7 @@ public abstract class AbstractBitsetBasicOperationsTest {
 
   @Test
   public void shouldNotTheDocIdSets() throws Exception {
-    OpenBitSetDISI bs = bitsetOperationsExecutor.bitsetOperations(dis, 10, new NOT());
+    OpenBitSetDISI bs = bitsetOperationsExecutor.perform(dis, 10, new NOT());
     assertFalse(bs.get(0));
     assertFalse(bs.get(1));
     assertFalse(bs.get(2));
@@ -115,7 +116,7 @@ public abstract class AbstractBitsetBasicOperationsTest {
 
   @Test
   public void shouldXORTheDodIdSets() throws Exception {
-    OpenBitSetDISI bs = bitsetOperationsExecutor.bitsetOperations(dis, 10, new XOR());
+    OpenBitSetDISI bs = bitsetOperationsExecutor.perform(dis, 10, new XOR());
     assertTrue(bs.get(0));
     assertFalse(bs.get(1));
     assertFalse(bs.get(2));

@@ -24,8 +24,18 @@ import org.apache.lucene.util.OpenBitSetDISI;
 
 import java.io.IOException;
 
+/**
+ * An operation that could easily be split in parts, producing partial results to accumulate at the end
+ */
 public interface CommutativeOp {
 
+  /**
+   * Performs the implemented operation getting bits from the given bitset and accumulating results on the accumulator
+   *
+   * @param accumulator the bitset where to accumulate results
+   * @param bitset      the bitset from where to get the bits
+   * @throws IOException if an error occurs when getting the bits
+   */
   void compute(OpenBitSetDISI accumulator, DocIdSet bitset) throws IOException;
 
   OpenBitSetDISI newAccumulator(int bitsetSize, DocIdSet b) throws IOException;

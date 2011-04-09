@@ -31,6 +31,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+/**
+ * BitsetOperationsExecutor is the entry point for performing bitset operations.<br/><br/>
+ * You need to create an array of the DocIdSet you want to operate on, choose the operation to perform (one implementation of @CommutativeOp or @ComparisonOp) and call the appropriate perform method.<br/><br/>
+ * The input array will be split in as many parts as available cores (as by Runtime.availableProcessors()), and the given operation will be performed
+ */
 public class BitsetOperationsExecutor {
 
   private static final int MIN_ARRAY_SIZE = 20000;
@@ -47,7 +52,16 @@ public class BitsetOperationsExecutor {
     this.minArraySize = minArraySize;
   }
 
-  public OpenBitSetDISI bitsetOperations(DocIdSet[] bs, final int finalBitsetSize, final CommutativeOp operation) throws Exception {
+  /**
+   * Performs a commutative operation on the given array of bitsets
+   *
+   * @param bs              the bitsets on to compute the operation
+   * @param finalBitsetSize the final bitset size (tipically IndexReader.numDocs())
+   * @param operation       the operation to perform
+   * @return an OpenBitSetDISI, result of the operation
+   * @throws Exception
+   */
+  public OpenBitSetDISI perform(DocIdSet[] bs, final int finalBitsetSize, final CommutativeOp operation) throws Exception {
     if (bs.length <= minArraySize) {
       return new CommutativeOpCallable(bs, 0, bs.length, finalBitsetSize, operation).call();
     }
@@ -68,7 +82,18 @@ public class BitsetOperationsExecutor {
     return new CommutativeOpCallable(accumulated, 0, accumulated.length, finalBitsetSize, operation).call();
   }
 
-  public <T> T[] bitsetOperations(DocIdSet[] bs, DocIdSet toCompare, final int finalBitsetSize, final ComparisonOp<T> operation) throws Exception {
+  /**
+   * Performs a comparative operation on the given array of bitsets
+   *
+   * @param bs              the bitsets on to compute the operation
+   * @param toCompare       the bitset to compare to the array of bitsets
+   * @param finalBitsetSize the final bitset size (tipically IndexReader.numDocs())
+   * @param operation       the operation to compute
+   * @param <T>             the return type
+   * @return an array of objects (whose type is defined by the operation). The array has the same size of the input array of bitsets and order is preserved so the result of the operation performed at bs[N] is at position N in the returned array
+   * @throws Exception
+   */
+  public <T> T[] perform(DocIdSet[] bs, DocIdSet toCompare, final int finalBitsetSize, final ComparisonOp<T> operation) throws Exception {
     final OpenBitSetDISI toCompareDisi = new OpenBitSetDISI(finalBitsetSize);
     toCompareDisi.inPlaceOr(toCompare.iterator());
 

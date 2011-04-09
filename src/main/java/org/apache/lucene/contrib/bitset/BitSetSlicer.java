@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.Callable;
 
-public abstract class BitSetSlicer<T> {
+abstract class BitSetSlicer<T> {
 
   public Collection<Callable<T>> sliceBitsets(DocIdSet[] bs) {
     int sliceSize = bs.length / Runtime.getRuntime().availableProcessors();

@@ -17,8 +17,9 @@
  * http://www.gnu.org/licenses/lgpl-3.0.txt
  */
 
-package org.apache.lucene.contrib.bitset;
+package org.apache.lucene.contrib.bitset.test;
 
+import org.apache.lucene.contrib.bitset.BitsetOperationsExecutor;
 import org.apache.lucene.contrib.bitset.ops.IntersectionCount;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.SortedVIntList;
@@ -55,7 +56,7 @@ public abstract class AbstractComparisonOperationsTest {
 
   @Test
   public void shouldIntersect() throws Exception {
-    Long[] result = bitsetOperationsExecutor.bitsetOperations(bs, new SortedVIntList(2, 3), 10, new IntersectionCount());
+    Long[] result = bitsetOperationsExecutor.perform(bs, new SortedVIntList(2, 3), 10, new IntersectionCount());
     assertEquals(bs.length, result.length);
     assertEquals(2, result[0].longValue());
     assertEquals(2, result[1].longValue());

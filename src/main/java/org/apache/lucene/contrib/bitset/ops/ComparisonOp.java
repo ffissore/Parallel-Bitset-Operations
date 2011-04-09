@@ -25,6 +25,11 @@ import org.apache.lucene.util.OpenBitSetDISI;
 
 import java.io.IOException;
 
+/**
+ * An operation that compares the given bitset with the content of an accumulator. The target bitset loads the accumulator that is compared with the toCompare bitset
+ *
+ * @param <T> the result of the comparison, for example a number for an intersection count
+ */
 public interface ComparisonOp<T> {
 
   T compute(OpenBitSetDISI accumulator, DocIdSet target, OpenBitSet toCompare) throws IOException;

@@ -17,8 +17,10 @@
  * http://www.gnu.org/licenses/lgpl-3.0.txt
  */
 
-package org.apache.lucene.contrib.bitset;
+package org.apache.lucene.contrib.bitset.test;
 
+import org.apache.lucene.contrib.bitset.BitsetOperationsExecutor;
+import org.apache.lucene.contrib.bitset.CommutativeOpCallable;
 import org.apache.lucene.contrib.bitset.ops.IntersectionCount;
 import org.apache.lucene.contrib.bitset.ops.OR;
 import org.apache.lucene.search.DocIdSet;
@@ -107,7 +109,7 @@ public class OperationLoadTest {
 
     System.out.println("========= FAST: START");
     startAt = System.currentTimeMillis();
-    finalBs = bitsetOperationsExecutor.bitsetOperations(docIdSets, BS_SIZE, operation);
+    finalBs = bitsetOperationsExecutor.perform(docIdSets, BS_SIZE, operation);
     long fastDuration = System.currentTimeMillis() - startAt;
     System.out.println("========= FAST: end");
 
@@ -154,7 +156,7 @@ public class OperationLoadTest {
 
     System.out.println("========= FAST: START");
     startAt = System.currentTimeMillis();
-    result = bitsetOperationsExecutor.bitsetOperations(docIdSets, toCompare, BS_SIZE, operation);
+    result = bitsetOperationsExecutor.perform(docIdSets, toCompare, BS_SIZE, operation);
     long fastDuration = System.currentTimeMillis() - startAt;
     System.out.println("========= FAST: end");
 

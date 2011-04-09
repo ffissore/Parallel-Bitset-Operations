@@ -17,8 +17,9 @@
  * http://www.gnu.org/licenses/lgpl-3.0.txt
  */
 
-package org.apache.lucene.contrib.bitset;
+package org.apache.lucene.contrib.bitset.test;
 
+import org.apache.lucene.contrib.bitset.BitsetOperationsExecutor;
 import org.junit.Before;
 
 public class SlicingBitsetBasicOperationTest extends AbstractBitsetBasicOperationsTest {
