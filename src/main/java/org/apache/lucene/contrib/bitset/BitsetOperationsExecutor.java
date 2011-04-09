@@ -33,8 +33,8 @@ import java.util.concurrent.Future;
 
 /**
  * BitsetOperationsExecutor is the entry point for performing bitset operations.<br/><br/>
- * You need to create an array of the DocIdSet you want to operate on, choose the operation to perform (one implementation of @CommutativeOp or @ComparisonOp) and call the appropriate perform method.<br/><br/>
- * The input array will be split in as many parts as available cores (as by Runtime.availableProcessors()), and the given operation will be performed
+ * You need to create an array of the {@link DocIdSet} you want to operate on, choose the operation to perform (one implementation of {@link CommutativeOp} or {@link ComparisonOp}) and call the appropriate perform method.<br/><br/>
+ * The input array will be split in as many parts as available cores (as by {@link Runtime#availableProcessors()}), and the given operation will be performed
  */
 public class BitsetOperationsExecutor {
 

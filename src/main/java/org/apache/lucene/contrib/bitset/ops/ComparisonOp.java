@@ -32,6 +32,15 @@ import java.io.IOException;
  */
 public interface ComparisonOp<T> {
 
+  /**
+   * An operation that compares the given bitset with the content of an accumulator. The target bitset loads the accumulator that is compared with the toCompare bitset
+   *
+   * @param accumulator the bitset used to load the content of the given DocIdSet
+   * @param target      the Nth bitset to compare
+   * @param toCompare   the bitset used as comparison
+   * @return the result of the comparison (for example, a number for {@link IntersectionCount})
+   * @throws IOException
+   */
   T compute(OpenBitSetDISI accumulator, DocIdSet target, OpenBitSet toCompare) throws IOException;
 
 }
