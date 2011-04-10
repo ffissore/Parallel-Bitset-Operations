@@ -77,7 +77,7 @@ public class BitsetOperationsExecutor {
 
     List<Future<OpenBitSetDISI>> futures = threadPool.invokeAll(ops);
 
-    OpenBitSetDISI[] accumulated = accumulate(futures);
+    OpenBitSetDISI[] accumulated = accumulateArray(futures);
 
     return new CommutativeOpCallable(accumulated, 0, accumulated.length, finalBitsetSize, operation).call();
   }
@@ -112,37 +112,22 @@ public class BitsetOperationsExecutor {
 
     List<Future<T[]>> futures = threadPool.invokeAll(ops);
 
-    return accumulate(futures);
+    return accumulateMatrix(futures);
   }
 
-  private OpenBitSetDISI[] accumulate(List<Future<OpenBitSetDISI>> futureOps) throws ExecutionException, InterruptedException {
-    OpenBitSetDISI[] accumulated = new OpenBitSetDISI[futureOps.size()];
+  private <T> T[] accumulateArray(List<Future<T>> futureOps) throws ExecutionException, InterruptedException {
+    Object[] accumulated = new Object[futureOps.size()];
     int i = 0;
-    for (Future<OpenBitSetDISI> op : futureOps) {
+    for (Future<T> op : futureOps) {
       accumulated[i] = op.get();
       i++;
     }
-    return accumulated;
+    return ArrayUtils.typedArray(accumulated);
   }
 
   @SuppressWarnings({"unchecked"})
-  private <T> T[] accumulate(List<Future<T[]>> futureOps) throws ExecutionException, InterruptedException {
-    Object[][] partitionResults = new Object[futureOps.size()][];
-    int i = 0;
-    int sum = 0;
-    for (Future<T[]> op : futureOps) {
-      partitionResults[i] = op.get();
-      sum += partitionResults[i].length;
-      i++;
-    }
-
-    Object[] result = new Object[sum];
-    int lastIndex = 0;
-    for (Object[] partial : partitionResults) {
-      System.arraycopy(partial, 0, result, lastIndex, partial.length);
-      lastIndex += partial.length;
-    }
-
-    return ArrayUtils.typedArray(result, (Class<T>) result[0].getClass());
+  private <T> T[] accumulateMatrix(List<Future<T[]>> futureOps) throws ExecutionException, InterruptedException {
+    T[][] partitionResults = accumulateArray(futureOps);
+    return ArrayUtils.flatten(partitionResults);
   }
 }

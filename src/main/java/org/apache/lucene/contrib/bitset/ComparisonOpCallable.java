@@ -61,6 +61,6 @@ public class ComparisonOpCallable<T> implements Callable<T[]> {
       result[i - fromIndex] = operation.compute(accumulator, bs[i], toCompareDisi);
     }
 
-    return ArrayUtils.typedArray(result, (Class<T>) result[0].getClass());
+    return ArrayUtils.typedArray(result);
   }
 }
