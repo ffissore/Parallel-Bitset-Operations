@@ -24,28 +24,15 @@ import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.util.OpenBitSetDISI;
 
-import java.util.concurrent.Callable;
+class ComparisonOpCallable<T> extends AbstractOpCallable<T[]> {
 
-public class ComparisonOpCallable<T> implements Callable<T[]> {
-
-  private final DocIdSet[] bs;
-  private final int fromIndex;
-  private final int toIndex;
-  private final int finalBitsetSize;
   private final OpenBitSet toCompare;
   private final ComparisonOp<T> operation;
 
   public ComparisonOpCallable(DocIdSet[] bs, int fromIndex, int toIndex, int finalBitsetSize, OpenBitSet toCompare, ComparisonOp<T> operation) {
-    this.bs = bs;
-    this.fromIndex = fromIndex;
-    this.toIndex = toIndex;
-    this.finalBitsetSize = finalBitsetSize;
+    super(bs, fromIndex, toIndex, finalBitsetSize);
     this.toCompare = toCompare;
     this.operation = operation;
-
-    if (bs.length == 0) {
-      throw new IllegalArgumentException("DocIdSet array cannot be empty");
-    }
   }
 
   @SuppressWarnings({"unchecked"})

@@ -17,10 +17,8 @@
  * http://www.gnu.org/licenses/lgpl-3.0.txt
  */
 
-package org.apache.lucene.contrib.bitset.test;
+package org.apache.lucene.contrib.bitset;
 
-import org.apache.lucene.contrib.bitset.BitsetOperationsExecutor;
-import org.apache.lucene.contrib.bitset.CommutativeOpCallable;
 import org.apache.lucene.contrib.bitset.ops.IntersectionCount;
 import org.apache.lucene.contrib.bitset.ops.OR;
 import org.apache.lucene.search.DocIdSet;
@@ -29,7 +27,6 @@ import org.apache.lucene.util.OpenBitSetDISI;
 import org.apache.lucene.util.SortedVIntList;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -93,7 +90,7 @@ public class OperationLoadTest {
   }
 
   @Test
-  @Ignore
+  //@Ignore
   public void parrallel_OR_ShouldBeFaster() throws Exception {
     OR operation = new OR();
 
@@ -130,7 +127,7 @@ public class OperationLoadTest {
   }
 
   @Test
-  @Ignore
+  //@Ignore
   public void parallel_IntersectionCount_ShouldBeFaster() throws Exception {
     IntersectionCount operation = new IntersectionCount();
     Long[] result = new Long[docIdSets.length];

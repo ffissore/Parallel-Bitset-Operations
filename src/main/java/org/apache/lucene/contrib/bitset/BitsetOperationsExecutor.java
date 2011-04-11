@@ -42,10 +42,21 @@ public class BitsetOperationsExecutor {
   private final ExecutorService threadPool;
   private final int minArraySize;
 
+  /**
+   * Create a new BitsetOperationsExecutor with the default minArraySize
+   *
+   * @param threadPool the ExecutorService to use to submit tasks
+   */
   public BitsetOperationsExecutor(ExecutorService threadPool) {
     this(threadPool, MIN_ARRAY_SIZE);
   }
 
+  /**
+   * Creates a new BitsetOperationsExecutor with the specified minArraySize
+   *
+   * @param threadPool   the ExecutorService to use to submit tasks
+   * @param minArraySize the minimum size of the input array of DocIdSet. If the input array contains less than the given size, the call will NOT trigger a thread and the calculation will be done in the same calling thread
+   */
   public BitsetOperationsExecutor(ExecutorService threadPool, int minArraySize) {
     this.threadPool = threadPool;
     this.minArraySize = minArraySize;

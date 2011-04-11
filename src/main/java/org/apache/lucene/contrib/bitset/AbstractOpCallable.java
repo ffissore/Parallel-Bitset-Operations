@@ -19,26 +19,25 @@
 
 package org.apache.lucene.contrib.bitset;
 
-import org.apache.lucene.contrib.bitset.ops.CommutativeOp;
 import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.util.OpenBitSetDISI;
 
-class CommutativeOpCallable extends AbstractOpCallable<OpenBitSetDISI> {
+import java.util.concurrent.Callable;
 
-  private final CommutativeOp operation;
+abstract class AbstractOpCallable<T> implements Callable<T> {
 
-  public CommutativeOpCallable(DocIdSet[] bs, int fromIndex, int toIndex, int finalBitsetSize, CommutativeOp operation) {
-    super(bs, fromIndex, toIndex, finalBitsetSize);
-    this.operation = operation;
-  }
+  protected final DocIdSet[] bs;
+  protected final int finalBitsetSize;
+  protected final int fromIndex;
+  protected final int toIndex;
 
-  @Override
-  public OpenBitSetDISI call() throws Exception {
-    OpenBitSetDISI accumulator = operation.newAccumulator(finalBitsetSize, bs[fromIndex]);
-    for (int i = fromIndex + 1; i < toIndex; i++) {
-      operation.compute(accumulator, bs[i]);
+  public AbstractOpCallable(DocIdSet[] bs, int fromIndex, int toIndex, int finalBitsetSize) {
+    this.bs = bs;
+    this.fromIndex = fromIndex;
+    this.toIndex = toIndex;
+    this.finalBitsetSize = finalBitsetSize;
+
+    if (bs.length == 0) {
+      throw new IllegalArgumentException("DocIdSet array cannot be empty");
     }
-    return accumulator;
   }
-
 }
