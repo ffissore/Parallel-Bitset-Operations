@@ -20,6 +20,9 @@
 package org.apache.lucene.contrib.bitset;
 
 import java.lang.reflect.Array;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 class ArrayUtils {
 
@@ -45,6 +48,22 @@ class ArrayUtils {
     }
 
     return typedArray(result);
+  }
+
+  public static <T> T[] toArray(List<Future<T>> futureOps) throws ExecutionException, InterruptedException {
+    Object[] accumulated = new Object[futureOps.size()];
+    int i = 0;
+    for (Future<T> op : futureOps) {
+      accumulated[i] = op.get();
+      i++;
+    }
+    return ArrayUtils.typedArray(accumulated);
+  }
+
+  @SuppressWarnings({"unchecked"})
+  public static <T> T[] accumulateMatrix(List<Future<T[]>> futureOps) throws ExecutionException, InterruptedException {
+    T[][] partitionResults = toArray(futureOps);
+    return ArrayUtils.flatten(partitionResults);
   }
 
 }

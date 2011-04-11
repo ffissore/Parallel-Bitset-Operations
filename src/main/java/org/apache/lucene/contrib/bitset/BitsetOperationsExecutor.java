@@ -27,7 +27,6 @@ import org.apache.lucene.util.OpenBitSetDISI;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -77,7 +76,7 @@ public class BitsetOperationsExecutor {
 
     List<Future<OpenBitSetDISI>> futures = threadPool.invokeAll(ops);
 
-    OpenBitSetDISI[] accumulated = accumulateArray(futures);
+    OpenBitSetDISI[] accumulated = ArrayUtils.toArray(futures);
 
     return new CommutativeOpCallable(accumulated, 0, accumulated.length, finalBitsetSize, operation).call();
   }
@@ -112,22 +111,9 @@ public class BitsetOperationsExecutor {
 
     List<Future<T[]>> futures = threadPool.invokeAll(ops);
 
-    return accumulateMatrix(futures);
-  }
+    T[][] partitionResults = ArrayUtils.toArray(futures);
 
-  private <T> T[] accumulateArray(List<Future<T>> futureOps) throws ExecutionException, InterruptedException {
-    Object[] accumulated = new Object[futureOps.size()];
-    int i = 0;
-    for (Future<T> op : futureOps) {
-      accumulated[i] = op.get();
-      i++;
-    }
-    return ArrayUtils.typedArray(accumulated);
-  }
-
-  @SuppressWarnings({"unchecked"})
-  private <T> T[] accumulateMatrix(List<Future<T[]>> futureOps) throws ExecutionException, InterruptedException {
-    T[][] partitionResults = accumulateArray(futureOps);
     return ArrayUtils.flatten(partitionResults);
   }
+
 }
