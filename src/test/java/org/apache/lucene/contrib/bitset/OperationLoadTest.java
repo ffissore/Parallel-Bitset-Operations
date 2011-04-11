@@ -27,6 +27,7 @@ import org.apache.lucene.util.OpenBitSetDISI;
 import org.apache.lucene.util.SortedVIntList;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -90,7 +91,7 @@ public class OperationLoadTest {
   }
 
   @Test
-  //@Ignore
+  @Ignore
   public void parrallel_OR_ShouldBeFaster() throws Exception {
     OR operation = new OR();
 
@@ -127,7 +128,7 @@ public class OperationLoadTest {
   }
 
   @Test
-  //@Ignore
+  @Ignore
   public void parallel_IntersectionCount_ShouldBeFaster() throws Exception {
     IntersectionCount operation = new IntersectionCount();
     Long[] result = new Long[docIdSets.length];
