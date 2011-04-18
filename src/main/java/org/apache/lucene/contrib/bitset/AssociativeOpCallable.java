@@ -19,15 +19,15 @@
 
 package org.apache.lucene.contrib.bitset;
 
-import org.apache.lucene.contrib.bitset.ops.CommutativeOp;
+import org.apache.lucene.contrib.bitset.ops.AssociativeOp;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.OpenBitSetDISI;
 
-class CommutativeOpCallable extends AbstractOpCallable<OpenBitSetDISI> {
+class AssociativeOpCallable extends AbstractOpCallable<OpenBitSetDISI> {
 
-  private final CommutativeOp operation;
+  private final AssociativeOp operation;
 
-  public CommutativeOpCallable(DocIdSet[] bs, int fromIndex, int toIndex, int finalBitsetSize, CommutativeOp operation) {
+  public AssociativeOpCallable(DocIdSet[] bs, int fromIndex, int toIndex, int finalBitsetSize, AssociativeOp operation) {
     super(bs, fromIndex, toIndex, finalBitsetSize);
     this.operation = operation;
   }

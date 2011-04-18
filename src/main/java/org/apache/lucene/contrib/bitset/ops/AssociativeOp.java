@@ -27,7 +27,7 @@ import java.io.IOException;
 /**
  * An operation that could easily be split in parts, producing partial results to accumulate at the end
  */
-public interface CommutativeOp {
+public interface AssociativeOp {
 
   /**
    * Performs the implemented operation getting bits from the given bitset and accumulating results on the accumulator

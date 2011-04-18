@@ -19,7 +19,7 @@
 
 package org.apache.lucene.contrib.bitset;
 
-import org.apache.lucene.contrib.bitset.ops.CommutativeOp;
+import org.apache.lucene.contrib.bitset.ops.AssociativeOp;
 import org.apache.lucene.contrib.bitset.ops.ComparisonOp;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.OpenBitSetDISI;
@@ -32,7 +32,7 @@ import java.util.concurrent.Future;
 
 /**
  * BitsetOperationsExecutor is the entry point for performing bitset operations.<br/><br/>
- * You need to create an array of the {@link DocIdSet} you want to operate on, choose the operation to perform (one implementation of {@link CommutativeOp} or {@link ComparisonOp}) and call the appropriate perform method.<br/><br/>
+ * You need to create an array of the {@link DocIdSet} you want to operate on, choose the operation to perform (one implementation of {@link org.apache.lucene.contrib.bitset.ops.AssociativeOp} or {@link ComparisonOp}) and call the appropriate perform method.<br/><br/>
  * The input array will be split in as many parts as available cores (as by {@link Runtime#availableProcessors()}), and the given operation will be performed
  */
 public class BitsetOperationsExecutor {
@@ -71,16 +71,16 @@ public class BitsetOperationsExecutor {
    * @return an OpenBitSetDISI, result of the operation
    * @throws Exception
    */
-  public OpenBitSetDISI perform(DocIdSet[] bs, final int finalBitsetSize, final CommutativeOp operation) throws Exception {
+  public OpenBitSetDISI perform(DocIdSet[] bs, final int finalBitsetSize, final AssociativeOp operation) throws Exception {
     if (bs.length <= minArraySize) {
-      return new CommutativeOpCallable(bs, 0, bs.length, finalBitsetSize, operation).call();
+      return new AssociativeOpCallable(bs, 0, bs.length, finalBitsetSize, operation).call();
     }
 
     Collection<Callable<OpenBitSetDISI>> ops = new BitSetSlicer<OpenBitSetDISI>() {
 
       @Override
       protected Callable<OpenBitSetDISI> newOpCallable(DocIdSet[] bs, int fromIndex, int toIndex) {
-        return new CommutativeOpCallable(bs, fromIndex, toIndex, finalBitsetSize, operation);
+        return new AssociativeOpCallable(bs, fromIndex, toIndex, finalBitsetSize, operation);
       }
 
     }.sliceBitsets(bs);
@@ -89,7 +89,7 @@ public class BitsetOperationsExecutor {
 
     OpenBitSetDISI[] accumulated = ArrayUtils.toArray(futures);
 
-    return new CommutativeOpCallable(accumulated, 0, accumulated.length, finalBitsetSize, operation).call();
+    return new AssociativeOpCallable(accumulated, 0, accumulated.length, finalBitsetSize, operation).call();
   }
 
   /**

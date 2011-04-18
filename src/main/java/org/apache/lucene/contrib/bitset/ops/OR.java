@@ -26,7 +26,7 @@ import org.apache.lucene.util.SortedVIntList;
 
 import java.io.IOException;
 
-public class OR implements CommutativeOp {
+public class OR implements AssociativeOp {
 
   @Override
   public void compute(OpenBitSetDISI accumulator, DocIdSet bitset) throws IOException {

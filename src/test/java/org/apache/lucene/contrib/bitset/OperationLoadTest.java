@@ -97,7 +97,7 @@ public class OperationLoadTest {
 
     System.out.println("========= SLOW: START");
     long startAt = System.currentTimeMillis();
-    OpenBitSetDISI finalBs = new CommutativeOpCallable(docIdSets, 0, docIdSets.length, BS_SIZE, operation).call();
+    OpenBitSetDISI finalBs = new AssociativeOpCallable(docIdSets, 0, docIdSets.length, BS_SIZE, operation).call();
     long slowDuration = System.currentTimeMillis() - startAt;
     System.out.println("========= SLOW: end");
 
